@@ -1,0 +1,15 @@
+Warnings encountered when parsing Domain/Problem File
+
+Errors: 0, warnings: 10
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 17: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 22: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 27: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 32: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 37: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 42: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 47: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 52: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 57: Warning: Undeclared requirement :negative-preconditions 
+/home/jakob/workspace_rosplan/src/project_package/domains/domain2.pddl: line: 62: Warning: Undeclared requirement :negative-preconditions 
+Number of literals: 14381
+Constructing lookup tables:

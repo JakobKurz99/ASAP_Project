@@ -1,0 +1,78 @@
+1 Install ROSPLAN
+
+1.1 Install Dependencies:
+
+$ sudo apt install flex bison freeglut3-dev libbdd-dev python-catkin-tools ros-$ROS_DISTRO-tf2-bullet
+
+1.2 Make ROS workspace:
+
+$ mkdir -p ROSPlan/src
+ cd ROSPlan/src
+
+1.3 Clone repository:
+
+$ git clone https://github.com/KCL-Planning/rosplan
+  cd ..
+
+1.4 Build Repository:
+
+$ catkin build
+
+# If the error is because package rosplan_dependencies fails, try building again
+
+2 Install Package TurtleBot3
+
+$ cd src
+  git clone https://github.com/ROBOTIS-GIT/turtlebot3.git
+  cd ..
+  catkin build
+
+# If you have following error:
+  Errors     << turtlebot3_bringup:cmake /home/automotive/ROSPlan/logs/turtlebot3_bringup/build.cmake.000.log
+  Failed     << turtlebot3_bringup:cmake                 [ Exited with code 1 ]  
+  Failed    <<< turtlebot3_bringup                       [ 1.4 seconds ] 
+
+2.1 Then istall the turtlebot3-msgs package using
+
+$ sudo apt-get install ros-melodic-turtlebot3-msgs  # For ros melodic
+$ sudo apt-get install ros-noetic-turtlebot3-msgs  # For ros noetic
+
+2.2 Then build again
+
+$ catkin build
+
+3 Install rosplan_demos and occupancy_grid_utils
+
+$ cd src
+  git clone https://github.com/KCL-Planning/rosplan_demos.git
+  git clone https://github.com/clearpathrobotics/occupancy_grid_utils
+  cd ..
+  catkin build
+
+# If you have following error:
+  Errors     << rosplan_interface_movebase:cmake /home/automotive/ROSPlan/logs/rosplan_interface_movebase/build.cmake.000.log
+  Failed     << rosplan_interface_movebase:cmake              [ Exited with code 1 ]
+  Failed    <<< rosplan_interface_movebase                    [ 1.2 seconds ] 
+
+3.1 Then istall the move-base-msgs package using
+
+$ sudo apt-get install ros-melodic-move-base-msgs  # For ros melodic
+$ sudo apt-get install ros-noetic-move-base-msgs  # For ros noetic
+
+3.2 Then build again
+
+$ catkin build
+
+# If the build is successful, then the installation of above packages is finished
+
+4 Additional installations
+
+4.1 Install map-server
+
+$ sudo apt-get install ros-melodic-map-server  # For ros melodic
+$ sudo apt-get install ros-noetic-map-server  # For ros noetic
+
+4.2 Install ros-navigation for amcl
+
+$ sudo apt-get install ros-melodic-navigation # For ros melodic
+$ sudo apt-get install ros-noetic-navigation # For ros noetic

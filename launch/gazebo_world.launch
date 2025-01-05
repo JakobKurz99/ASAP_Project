@@ -1,0 +1,14 @@
+<launch>
+    <!-- Argument for world file -->
+    <arg name="world_file" default="$(find project_package)/worlds/gridworld.sdf"/>
+
+    <!-- Argument for map file -->
+    <arg name="map_file" default="$(find project_package)/worlds/grid.yaml"/>
+
+    <!-- Gazebo server -->
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" args="-s libgazebo_ros_factory.so $(arg world_file)" />
+
+    <!-- Gazebo client -->
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" />
+</launch>
+

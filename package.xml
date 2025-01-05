@@ -1,0 +1,19 @@
+<package format="2">
+  <name>project_package</name>
+  <version>0.0.0</version>
+  <description>Ein Beispielprojekt für ROSPlan und Gazebo</description>
+
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>BSD</license>
+
+  <!-- Abhängigkeiten -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>gazebo_ros</depend>
+
+  <export>
+  </export>
+</package>
+
