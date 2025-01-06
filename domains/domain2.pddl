@@ -10,55 +10,26 @@
     (object_at ?obj - object ?y - grid_box)
     (free ?r - robot)
     (holding ?r - robot ?obj - object)
+    (accessible ?cell - grid_box) ; Neues Prädikat für zugängliche Felder
   )
   (:action move_right
     :parameters (?r - robot ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (right_of ?from ?to) (free ?r))
+    :precondition (and (robot_at ?r ?from) (right_of ?from ?to) (free ?r) (accessible ?to))
     :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
   )
   (:action move_left
     :parameters (?r - robot ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (left_of ?from ?to) (free ?r))
+    :precondition (and (robot_at ?r ?from) (left_of ?from ?to) (free ?r) (accessible ?to))
     :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
   )
   (:action move_up
     :parameters (?r - robot ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (up_of ?from ?to) (free ?r))
+    :precondition (and (robot_at ?r ?from) (up_of ?from ?to) (free ?r) (accessible ?to))
     :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
   )
   (:action move_down
     :parameters (?r - robot ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (down_of ?from ?to) (free ?r))
-    :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
-  )
-  (:action pick
-    :parameters (?r - robot ?obj - object ?grid_box - grid_box)
-    :precondition (and (robot_at ?r ?grid_box) (object_at ?obj ?grid_box) (free ?r))
-    :effect (and (not (object_at ?obj ?grid_box)) (holding ?r ?obj) (not (free ?r)))
-  )
-  (:action drop
-    :parameters (?r - robot ?obj - object ?grid_box - grid_box)
-    :precondition (and (robot_at ?r ?grid_box) (holding ?r ?obj))
-    :effect (and (object_at ?obj ?grid_box) (not (holding ?r ?obj)) (free ?r))
-  )
-  (:action carry_right
-    :parameters (?r - robot ?obj - object ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (right_of ?from ?to) (holding ?r ?obj))
-    :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
-  )
-  (:action carry_left
-    :parameters (?r - robot ?obj - object ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (left_of ?from ?to) (holding ?r ?obj))
-    :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
-  )
-  (:action carry_up
-    :parameters (?r - robot ?obj - object ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (up_of ?from ?to) (holding ?r ?obj))
-    :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
-  )
-  (:action carry_down
-    :parameters (?r - robot ?obj - object ?from - grid_box ?to - grid_box)
-    :precondition (and (robot_at ?r ?from) (down_of ?from ?to) (holding ?r ?obj))
+    :precondition (and (robot_at ?r ?from) (down_of ?from ?to) (free ?r) (accessible ?to))
     :effect (and (not (robot_at ?r ?from)) (robot_at ?r ?to))
   )
 )

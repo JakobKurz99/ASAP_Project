@@ -31,7 +31,7 @@ def set_model_state(model_name, x, y, z=0.5):
         return False
 
 def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y):
-    """Simuliert einen Schuss des Balls in Richtung des Tors."""
+    """Simuliert einen Schuss des Balls in Richtung des Tors und hält ihn im Torbereich."""
     dx = goal_x - ball_x
     dy = goal_y - ball_y
     angle = math.atan2(dy, dx)
@@ -48,10 +48,16 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y):
     new_x = round(new_x) if abs(new_x - int(new_x)) < 0.5 else math.ceil(new_x)
     new_y = round(new_y) if abs(new_y - int(new_y)) < 0.5 else math.ceil(new_y)
 
-    # Wenn der Ball im Tor ist oder die Grenze überschreitet, stoppe ihn
-    if new_x <= -0.5:
+    # Wenn der Ball im Torbereich ist (zwischen x = 0 und -0.5 und y = 18 bis 22), halte ihn an Ort und Stelle
+    if -0.5 <= new_x <= 0 and 18 <= new_y <= 22:
+        print(f"Ball ist im Torbereich bei x: {new_x}, y: {new_y}. Ball bleibt an Ort und Stelle.")
+        new_x = -0.5  # Fixiere die Position im Tor
+        new_y = max(18, min(new_y, 22))  # Ball bleibt im Bereich zwischen y = 18 und y = 22
+
+    # Wenn der Ball im Torbereich bei x < -0.2 kommt, stoppe ihn
+    elif new_x <= -0.2:
         print(f"Ball erreicht das Torbereich bei x: {new_x}, y: {new_y}. Stoppe Bewegung.")
-        new_x = 0  # Angenommene Stoppposition für das Tor
+        new_x = -0.5  # Angenommene Stoppposition für das Tor
         new_y = max(18, min(new_y, 22))  # Im Torbereich zwischen 18 und 22 halten
 
     print(f"Schieße Ball von x: {ball_x}, y: {ball_y} zu x: {new_x}, y: {new_y}")
@@ -68,8 +74,12 @@ def update_problem_files(robot_x, robot_y, ball_x, ball_y):
         lines = f.readlines()
 
     lines[4707] = f"(robot_at kenny g{robot_x}_{robot_y})\n"
-    lines[4708] = f"(object_at ball g{ball_x}_{ball_y})\n"
-    lines[4711] = f"(robot_at kenny g{ball_x}_{ball_y})\n"
+    if (robot_x < ball_x & robot_y < ball_y):
+        lines[4708] = f"(object_at ball g{ball_x + 1}_{ball_y + 1})\n"
+        lines[4711] = f"(robot_at kenny g{ball_x + 1}_{ball_y + 1})\n"
+    else:
+        lines[4708] = f"(object_at ball g{ball_x + 1}_{ball_y})\n"
+        lines[4711] = f"(robot_at kenny g{ball_x + 1}_{ball_y})\n"
 
     with open(problem1_file, "w") as f:
         f.writelines(lines)
@@ -79,7 +89,10 @@ def update_problem_files(robot_x, robot_y, ball_x, ball_y):
         lines = f.readlines()
 
     lines[9] = f"(robot_at kenny cell_{robot_x}_{robot_y})\n"
-    lines[9417] = f"(robot_at kenny cell_{ball_x}_{ball_y})\n"
+    if (robot_x < ball_x & robot_y < ball_y):
+        lines[11811] = f"(robot_at kenny cell_{ball_x + 1}_{ball_y + 1})\n"
+    else:
+        lines[11811] = f"(robot_at kenny cell_{ball_x + 1}_{ball_y + 1})\n"
 
     with open(problem2_file, "w") as f:
         f.writelines(lines)

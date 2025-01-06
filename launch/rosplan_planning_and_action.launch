@@ -20,23 +20,5 @@
 	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
 		<arg name="pddl_action_name" value="move_down" />
 	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="carry_right" />
-	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="carry_left" />
-	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="carry_up" />
-	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="carry_down" />
-	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="pick" />
-	</include>
-	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-		<arg name="pddl_action_name" value="drop" />
-	</include>
 </launch>
 
