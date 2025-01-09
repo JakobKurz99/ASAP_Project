@@ -62405,6 +62405,110 @@
         <pose>59 39 0.05 0 0 0</pose>
       </link>
     </model>
+    <model name='cell_-1_18'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <pose>-1 18 0.05 0 0 0</pose>
+      </link>
+    </model>
+    <model name='cell_-1_19'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <pose>-1 19 0.05 0 0 0</pose>
+      </link>
+    </model>
+    <model name='cell_-1_20'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <pose>-1 20 0.05 0 0 0</pose>
+      </link>
+    </model>
+    <model name='cell_-1_21'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/White</name>
+            </script>
+          </material>
+        </visual>
+        <pose>-1 21 0.05 0 0 0</pose>
+      </link>
+    </model>
 
     <!-- Walls -->
     <model name='wall_north'>
@@ -62588,7 +62692,7 @@
     </model>
 
     <model name='object1'>
-      <pose>30 10 0.5 0 0 0</pose>
+      <pose>5 20 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -62617,7 +62721,7 @@
     </model>
 
     <model name='object2'>
-      <pose>25 25 0.5 0 0 0</pose>
+      <pose>46 23 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -62646,7 +62750,7 @@
     </model>
 
     <model name='object3'>
-      <pose>45 15 0.5 0 0 0</pose>
+      <pose>35 38 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -62675,7 +62779,7 @@
     </model>
 
     <model name='object4'>
-      <pose>18 6 0.5 0 0 0</pose>
+      <pose>57 22 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -62704,7 +62808,7 @@
     </model>
 
     <model name='object5'>
-      <pose>20 30 0.5 0 0 0</pose>
+      <pose>21 33 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -62733,7 +62837,7 @@
     </model>
 
     <model name='robot'>
-      <pose>59 39 0.5 0 0 0</pose>
+      <pose>44 39 0.5 0 0 0</pose>
       <static>false</static>
       <link name='link'>
         <collision name='collision'>
@@ -62780,7 +62884,7 @@
 
     <!-- Ball -->
     <model name='ball'>
-      <pose>30 6 0.5 0 0 0</pose>
+      <pose>46 2 0.5 0 0 0</pose>
       <static>false</static>
       <link name='link'>
         <collision name='collision'>
