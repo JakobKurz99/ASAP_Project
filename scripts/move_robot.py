@@ -67,14 +67,14 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, cu
         print(f"Schritt {i}: Ball bewegt sich zu x={current_x:.2f}, y={current_y:.2f} (Grid: x={grid_x}, y={grid_y})")
 
         # Reflektion prüfen und durchführen
-        if grid_x == 0 and not (18 <= grid_y < 22):  # Reflektion an der linken Wand außerhalb des Torbereichs
-            print(f"Ball trifft linke Wand bei x={grid_x}. Reflektiere.")
+        if current_x <= 0 and not (18 <= current_y < 22):  # Reflektion an der linken Wand außerhalb des Torbereichs
+            print(f"Ball trifft linke Wand bei x={current_x}. Reflektiere.")
             dx *= -1  # Reflektion entlang der x-Achse
-        elif grid_x == 60:  # Reflektion an der rechten Wand
-            print(f"Ball trifft rechte Wand bei x={grid_x}. Reflektiere.")
+        elif current_x >= 60:  # Reflektion an der rechten Wand
+            print(f"Ball trifft rechte Wand bei x={current_x}. Reflektiere.")
             dx *= -1  # Reflektion entlang der x-Achse
-        if grid_y <= 0 or grid_y >= 40:  # Reflektion an der oberen oder unteren Wand
-            print(f"Ball trifft horizontale Wand bei y={grid_y}. Reflektiere.")
+        if current_y <= 0 or current_y >= 40:  # Reflektion an der oberen oder unteren Wand
+            print(f"Ball trifft horizontale Wand bei y={current_y}. Reflektiere.")
             dy *= -1  # Reflektion entlang der y-Achse
 
         # Prüfe Reflektion an stationären Objekten
@@ -88,7 +88,7 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, cu
                     dy *= -1
 
         # Prüfe, ob der Ball das Tor erreicht
-        if -1 <= grid_x < 0 and 18 <= grid_y <= 22:
+        if -1 <= grid_x < 0 and 18 <= grid_y < 22:
             print(f"Ball erreicht Torzelle bei x={grid_x}, y={grid_y}. Bewegung wird gestoppt.")
             set_model_state("ball", current_x, current_y)  # Exakte Werte für Gazebo
             return grid_x, grid_y, True, (current_x, current_y)  # Aktuelle Position hinzufügen
@@ -150,12 +150,12 @@ def update_world_and_problem2(positions):
     with open(world_file, "r") as f:
         lines = f.readlines()
 
-    lines[62694] = f"      <pose>{object1_x} {object1_y} 0.5 0 0 0</pose>\n"
-    lines[62721] = f"      <pose>{object2_x} {object2_y} 0.5 0 0 0</pose>\n"
-    lines[62748] = f"      <pose>{object3_x} {object3_y} 0.5 0 0 0</pose>\n"
-    lines[62775] = f"      <pose>{object4_x} {object4_y} 0.5 0 0 0</pose>\n"
-    lines[62802] = f"      <pose>{object5_x} {object5_y} 0.5 0 0 0</pose>\n"
-    lines[62829] = f"      <pose>{robot_x} {robot_y} 0.5 0 0 0</pose>\n"
+    lines[62694] = f"      <pose>{object1_x + 0.5} {object1_y + 0.5} 0.5 0 0 0</pose>\n"
+    lines[62721] = f"      <pose>{object2_x + 0.5} {object2_y + 0.5} 0.5 0 0 0</pose>\n"
+    lines[62748] = f"      <pose>{object3_x + 0.5} {object3_y + 0.5} 0.5 0 0 0</pose>\n"
+    lines[62775] = f"      <pose>{object4_x + 0.5} {object4_y + 0.5} 0.5 0 0 0</pose>\n"
+    lines[62802] = f"      <pose>{object5_x + 0.5} {object5_y + 0.5} 0.5 0 0 0</pose>\n"
+    lines[62829] = f"      <pose>{robot_x + 0.5} {robot_y + 0.5} 0.5 0 0 0</pose>\n"
     lines[62874] = f"      <pose>{ball_x + 0.5} {ball_y + 0.5} 0.5 0 0 0</pose>\n"
 
     with open(world_file, "w") as f:
@@ -238,6 +238,27 @@ def get_object_cells(problem_file):
         print(f"Fehler beim Lesen der Objektpositionen: {e}")
     return object_cells
 
+def get_ball_position_from_line(file_path, line_number):
+    """Liest die Ballposition aus der angegebenen Zeile der Datei."""
+    try:
+        with open(file_path, "r") as file:
+            lines = file.readlines()
+            if line_number < len(lines):
+                line = lines[line_number - 1]  # Zeilen sind 0-basiert
+                if "(object_at ball g" in line:
+                    # Extrahiere die Position, z. B. aus "(object_at ball g8_23)"
+                    position = line.strip().split("g")[-1].strip(")")
+                    x, y = map(int, position.split("_"))
+                    return x, y
+                else:
+                    print(f"Zeile {line_number} enthält keine gültige Ballposition.")
+            else:
+                print(f"Zeile {line_number} ist außerhalb des Bereichs der Datei.")
+    except FileNotFoundError:
+        print(f"Fehler: Datei '{file_path}' wurde nicht gefunden.")
+    except Exception as e:
+        print(f"Fehler beim Lesen der Ballposition: {e}")
+    return None, None
 
 def execute_planner():
     """Führt den Planer aus."""
@@ -256,13 +277,15 @@ if __name__ == "__main__":
     object_cells = get_object_cells(problem2_file)
     print(f"Objektzellen geladen: {object_cells}")
 
-    # Initiale Position des Balls
-    ball_x, ball_y = 30, 22  # Beispielhafte Startkoordinaten im Gitter
-    current_position = (ball_x + 0.5, ball_y + 0.5)  # Setze initiale Position auf die Mitte der Zelle
+    # Lese die Ballposition aus Zeile 4708 in problem1.pddl
+    ball_x, ball_y = get_ball_position_from_line(problem1_file, 4709)
+
+    # Setze die aktuelle Position des Balls
+    current_position = (ball_x + 0.5, ball_y + 0.5)
+    print(f"Startposition des Balls: current_position={current_position}")
 
     while True:
         execute_planner()
-
         parsing_started = False
         last_target_position = None
 

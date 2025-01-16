@@ -4705,10 +4705,10 @@
 (beside cell_55_39 cell_56_39)
 (beside cell_56_39 cell_57_39)
 (beside cell_57_39 cell_58_39)
-(robot_at kenny g59_18)
-(object_at ball g8_23)
+(robot_at kenny g28_30)
+(object_at ball g15_10)
 )
 (goal: (and
-(robot_at kenny g8_23)
+(robot_at kenny g15_10)
 ))
 )
