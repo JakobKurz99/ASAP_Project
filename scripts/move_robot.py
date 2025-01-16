@@ -33,8 +33,12 @@ def set_model_state(model_name, x, y, z=0.5):
 
 import math
 
-def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells):
+def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, current_position=None):
     """Bewegt den Ball iterativ entlang des Bewegungsvektors bis zur maximalen Distanz oder dem Tor."""
+    # Falls eine aktuelle Position übergeben wurde, setze sie als Startpunkt
+    if current_position:
+        ball_x, ball_y = current_position
+
     dx = goal_x - ball_x
     dy = goal_y - ball_y
     angle = math.atan2(dy, dx)
@@ -47,20 +51,16 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells):
     max_distance = 10
     dx = math.cos(angle) * max_distance
     dy = math.sin(angle) * max_distance
-    vector_length = math.sqrt(dx**2 + dy**2)
-    step_fraction = min(1, max_distance / vector_length)  # Schrittweite auf max. 10 Meter begrenzen
-    step_x = dx * step_fraction
-    step_y = dy * step_fraction
 
-    print(f"Berechne Bewegungsvektor: Schritt x={step_x}, Schritt y={step_y}")
+    print(f"Berechne Bewegungsvektor: dx={dx}, dy={dy}")
 
     # Iterative Bewegung entlang des Vektors
     current_x, current_y = ball_x, ball_y
     for i in range(1, 101):  # Maximal 10 Schritte (entspricht 10 Meter in 0.1-Meter-Schritten)
-        current_x += step_x / 100  # Teile den Vektor in 100 kleine Schritte
-        current_y += step_y / 100
+        current_x += dx / 100  # Teile den Vektor in 100 kleine Schritte
+        current_y += dy / 100
 
-        # Runde auf das Grid (immer zur gleichen ganzen Zahl)
+        # Runde auf das Grid für Planungszwecke
         grid_x = math.floor(current_x)
         grid_y = math.floor(current_y)
 
@@ -69,39 +69,37 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells):
         # Reflektion prüfen und durchführen
         if grid_x == 0 and not (18 <= grid_y < 22):  # Reflektion an der linken Wand außerhalb des Torbereichs
             print(f"Ball trifft linke Wand bei x={grid_x}. Reflektiere.")
-            step_x *= -1  # Reflektion entlang der x-Achse
+            dx *= -1  # Reflektion entlang der x-Achse
         elif grid_x == 60:  # Reflektion an der rechten Wand
             print(f"Ball trifft rechte Wand bei x={grid_x}. Reflektiere.")
-            step_x *= -1  # Reflektion entlang der x-Achse
+            dx *= -1  # Reflektion entlang der x-Achse
         if grid_y <= 0 or grid_y >= 40:  # Reflektion an der oberen oder unteren Wand
             print(f"Ball trifft horizontale Wand bei y={grid_y}. Reflektiere.")
-            step_y *= -1  # Reflektion entlang der y-Achse
+            dy *= -1  # Reflektion entlang der y-Achse
 
         # Prüfe Reflektion an stationären Objekten
         for obj_cell in object_cells:
-            # Entferne den Präfix "cell_" und teile die Koordinaten
             obj_x, obj_y = map(int, obj_cell.replace("cell_", "").split('_'))
             if obj_x <= current_x < obj_x + 1 and obj_y <= current_y < obj_y + 1:
                 print(f"Ball trifft Objekt bei {obj_cell}. Reflektiere.")
                 if obj_x <= grid_x < obj_x + 1:  # Reflektion an x-Seiten des Objekts
-                    step_x *= -1
+                    dx *= -1
                 if obj_y <= grid_y < obj_y + 1:  # Reflektion an y-Seiten des Objekts
-                    step_y *= -1
-
+                    dy *= -1
 
         # Prüfe, ob der Ball das Tor erreicht
         if -1 <= grid_x < 0 and 18 <= grid_y <= 22:
             print(f"Ball erreicht Torzelle bei x={grid_x}, y={grid_y}. Bewegung wird gestoppt.")
-            set_model_state("ball", grid_x, grid_y)
-            return grid_x, grid_y, True  # Ball im Tor
+            set_model_state("ball", current_x, current_y)  # Exakte Werte für Gazebo
+            return grid_x, grid_y, True, (current_x, current_y)  # Aktuelle Position hinzufügen
 
         # Bewege den Ball schrittweise in Gazebo
         set_model_state("ball", current_x, current_y)
 
     # Wenn der Ball die maximale Distanz zurückgelegt hat, ohne das Tor zu erreichen
     print(f"Ball hat maximale Distanz erreicht bei x={grid_x}, y={grid_y}. Kein Tor.")
-    set_model_state("ball", grid_x, grid_y)
-    return grid_x, grid_y, False  # Kein Tor
+    set_model_state("ball", current_x, current_y)  # Exakte Werte für Gazebo
+    return grid_x, grid_y, False, (current_x, current_y)  # Aktuelle Position hinzufügen
 
 def generate_random_noise():
     """Generiert ein zufälliges Richtungsrauschen gemäß der Bedingung."""
@@ -130,7 +128,10 @@ def update_problem_files(robot_x, robot_y, ball_x, ball_y):
         lines = f.readlines()
 
     lines[9] = f"(robot_at kenny cell_{robot_x}_{robot_y})\n"
-    lines[11811] = f"(robot_at kenny cell_{ball_x}_{ball_y})\n"
+    if ball_x < 59:
+        lines[11852] = f"  (goal_reachable cell_{ball_x + 1}_{ball_y} cell_{ball_x}_{ball_y})\n"
+    else:
+        lines[11852] = f"  (goal_reachable cell_{ball_x - 1}_{ball_y} cell_{ball_x}_{ball_y})\n"
 
     with open(problem2_file, "w") as f:
         f.writelines(lines)
@@ -150,12 +151,12 @@ def update_world_and_problem2(positions):
         lines = f.readlines()
 
     lines[62694] = f"      <pose>{object1_x} {object1_y} 0.5 0 0 0</pose>\n"
-    lines[62723] = f"      <pose>{object2_x} {object2_y} 0.5 0 0 0</pose>\n"
-    lines[62752] = f"      <pose>{object3_x} {object3_y} 0.5 0 0 0</pose>\n"
-    lines[62781] = f"      <pose>{object4_x} {object4_y} 0.5 0 0 0</pose>\n"
-    lines[62810] = f"      <pose>{object5_x} {object5_y} 0.5 0 0 0</pose>\n"
-    lines[62839] = f"      <pose>{robot_x} {robot_y} 0.5 0 0 0</pose>\n"
-    lines[62886] = f"      <pose>{ball_x} {ball_y} 0.5 0 0 0</pose>\n"
+    lines[62721] = f"      <pose>{object2_x} {object2_y} 0.5 0 0 0</pose>\n"
+    lines[62748] = f"      <pose>{object3_x} {object3_y} 0.5 0 0 0</pose>\n"
+    lines[62775] = f"      <pose>{object4_x} {object4_y} 0.5 0 0 0</pose>\n"
+    lines[62802] = f"      <pose>{object5_x} {object5_y} 0.5 0 0 0</pose>\n"
+    lines[62829] = f"      <pose>{robot_x} {robot_y} 0.5 0 0 0</pose>\n"
+    lines[62874] = f"      <pose>{ball_x + 0.5} {ball_y + 0.5} 0.5 0 0 0</pose>\n"
 
     with open(world_file, "w") as f:
         f.writelines(lines)
@@ -255,6 +256,10 @@ if __name__ == "__main__":
     object_cells = get_object_cells(problem2_file)
     print(f"Objektzellen geladen: {object_cells}")
 
+    # Initiale Position des Balls
+    ball_x, ball_y = 30, 22  # Beispielhafte Startkoordinaten im Gitter
+    current_position = (ball_x + 0.5, ball_y + 0.5)  # Setze initiale Position auf die Mitte der Zelle
+
     while True:
         execute_planner()
 
@@ -272,15 +277,18 @@ if __name__ == "__main__":
 
                     try:
                         parts = line.strip().split()
-                        if len(parts) < 5:
+                        if len(parts) < 6:  # Stelle sicher, dass genug Teile vorhanden sind
                             continue
-                        
-                        _, _, start_cell, end_cell = parts[:4]
-                        _, x_end, y_end = end_cell.split('_')
+
+                        # Extrahiere die Zielzelle
+                        end_cell = parts[4].strip(')')  # Entferne die schließende Klammer
+                        _, x_end, y_end = end_cell.split('_')  # Extrahiere x und y
                         x_end, y_end = int(x_end), int(y_end)
                         last_target_position = (x_end, y_end)
 
                         print(f"Bewege Roboter zu x: {x_end}, y: {y_end}")
+                        x_end = x_end + 0.5
+                        y_end = y_end + 0.5
                         success = set_model_state("robot", x_end, y_end)
                         if not success:
                             print(f"Fehler: Konnte Position x: {x_end}, y: {y_end} nicht setzen.")
@@ -291,12 +299,13 @@ if __name__ == "__main__":
 
             if last_target_position:
                 robot_x, robot_y = last_target_position
-                ball_x, ball_y = last_target_position
                 goal_x, goal_y = -1, 20
 
+                print(f"Neue Ballposition für Kicksimulation: current_position={current_position}")
+
                 # Kick den Ball und übergebe die Objektzellen
-                new_ball_x, new_ball_y, is_goal = kick_ball(
-                    robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells
+                new_ball_x, new_ball_y, is_goal, current_position = kick_ball(
+                    robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, current_position
                 )
 
                 # Wenn der Ball im Tor ist, starte den Reset-Prozess
@@ -305,11 +314,14 @@ if __name__ == "__main__":
                     positions = generate_positions_for_entities()
                     new_ball_x, new_ball_y = positions["ball"]
                     robot_x, robot_y = positions["robot"]
+                    current_position = (new_ball_x + 0.5, new_ball_y + 0.5)  # Neue Position nach Reset
                     update_problem_files(robot_x, robot_y, new_ball_x, new_ball_y)
                     update_world_and_problem2(positions)
                     print("Reset abgeschlossen. Programm beendet.")
                     break  # Programm erfolgreich beenden
 
+                print(f"Roboterposition für planner x: {robot_x}, y: {robot_y}")
+                print(f"Neue Ballposition für planner x: {new_ball_x}, y: {new_ball_y}")
                 # Aktualisiere Problemdateien nur, wenn kein Tor erzielt wurde
                 update_problem_files(robot_x, robot_y, new_ball_x, new_ball_y)
 

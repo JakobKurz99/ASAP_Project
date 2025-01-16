@@ -62692,23 +62692,21 @@
     </model>
 
     <model name='object1'>
-      <pose>5 20 0.5 0 0 0</pose>
+      <pose>44 33 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62721,23 +62719,21 @@
     </model>
 
     <model name='object2'>
-      <pose>46 23 0.5 0 0 0</pose>
+      <pose>37 17 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62750,23 +62746,21 @@
     </model>
 
     <model name='object3'>
-      <pose>35 38 0.5 0 0 0</pose>
+      <pose>19 16 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62779,23 +62773,21 @@
     </model>
 
     <model name='object4'>
-      <pose>57 22 0.5 0 0 0</pose>
+      <pose>49 35 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62808,23 +62800,21 @@
     </model>
 
     <model name='object5'>
-      <pose>21 33 0.5 0 0 0</pose>
+      <pose>31 13 0.5 0 0 0</pose>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62837,23 +62827,21 @@
     </model>
 
     <model name='robot'>
-      <pose>44 39 0.5 0 0 0</pose>
-      <static>false</static>
+      <pose>59 18 0.5 0 0 0</pose>
+      <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name='visual'>
           <geometry>
-            <cylinder>
-              <radius>0.5</radius>
-              <length>1</length>
-            </cylinder>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <material>
             <script>
@@ -62884,8 +62872,8 @@
 
     <!-- Ball -->
     <model name='ball'>
-      <pose>46 2 0.5 0 0 0</pose>
-      <static>false</static>
+      <pose>8.5 23.5 0.5 0 0 0</pose>
+      <static>true</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
@@ -62903,7 +62891,7 @@
         <visual name='visual'>
           <geometry>
             <sphere>
-              <radius>0.5</radius>
+              <radius>0.1</radius>
             </sphere>
           </geometry>
           <material>
