@@ -33,22 +33,78 @@ def set_model_state(model_name, x, y, z=0.5):
 
 import math
 
+def normalize_angle(angle):
+    """Normalisiert einen Winkel auf den Bereich [-pi, pi]."""
+    while angle > math.pi:
+        angle -= 2 * math.pi
+    while angle < -math.pi:
+        angle += 2 * math.pi
+    return angle
+
+def calculate_kick_angle(ball_x, ball_y, goal_x, goal_y, object_cells):
+    """Berechnet den Winkel, um den Ball zum Tor zu schießen."""
+    # Berechne den Winkel zum Tor
+    angle = math.atan2(goal_y - ball_y, goal_x - ball_x)
+
+    # Check if static robots are in the way
+    free_shot = 0
+    while free_shot<3:
+        max_angle_obj = []
+        min_angle_obj = []
+        for obj_cell in object_cells:
+            obj_x, obj_y = map(int, obj_cell.replace("cell_", "").split('_'))
+            # Calculate distance from ball to object
+            distance_to_obj = []
+            distance_to_obj.append(math.sqrt((ball_x - (obj_x))**2 + (ball_y - (obj_y))**2))
+            distance_to_obj.append(math.sqrt((ball_x - (obj_x+1))**2 + (ball_y - (obj_y))**2))
+            distance_to_obj.append(math.sqrt((ball_x - (obj_x))**2 + (ball_y - (obj_y+1))**2))
+            distance_to_obj.append(math.sqrt((ball_x - (obj_x+1))**2 + (ball_y - (obj_y+1))**2))
+            min_distance_obj = min(distance_to_obj)
+            if min_distance_obj <= 10:
+                angle_to_obj = []
+                angle_to_obj.append(normalize_angle(math.atan2(obj_y - ball_y, obj_x - ball_x) - angle))
+                angle_to_obj.append(normalize_angle(math.atan2(obj_y - ball_y, obj_x + 1 - ball_x) - angle))
+                angle_to_obj.append(normalize_angle(math.atan2(obj_y + 1 - ball_y, obj_x - ball_x) - angle))
+                angle_to_obj.append(normalize_angle(math.atan2(obj_y + 1 - ball_y, obj_x + 1 - ball_x) - angle))
+                # if any of the absolute angles is smaller than 20°, the object is in the way 
+                if any(abs(a) < math.radians(20) for a in angle_to_obj):
+                    max_angle_obj.append(max(angle_to_obj))
+                    min_angle_obj.append(min(angle_to_obj))
+        if max_angle_obj and min_angle_obj:
+            free_shot += 1
+            # print(f"Max angle: {max(max_angle_obj)}, Min angle: {min(min_angle_obj)}")
+            if abs(max(max_angle_obj)) > abs(min(min_angle_obj)):
+                angle += min(min_angle_obj) - math.radians(20)
+            else:
+                angle += max(max_angle_obj) + math.radians(20)
+        else:
+            break
+    # print(f"Attempts: {free_shot}")
+    return angle
+
+def calculate_kick_distance(ball_x, ball_y, goal_x, goal_y):
+    if ball_x <= 3:
+        # calculate distance to goal posts
+        d1 = math.sqrt((goal_x - ball_x)**2 + (goal_y - 2 - ball_y)**2)
+        d2 = math.sqrt((goal_x - ball_x)**2 + (goal_y + 2 - ball_y)**2)
+        d = max(d1, d2)+0.1
+        return min(d, 10)
+    return 10
+
 def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, current_position=None):
     """Bewegt den Ball iterativ entlang des Bewegungsvektors bis zur maximalen Distanz oder dem Tor."""
     # Falls eine aktuelle Position übergeben wurde, setze sie als Startpunkt
     if current_position:
         ball_x, ball_y = current_position
 
-    dx = goal_x - ball_x
-    dy = goal_y - ball_y
-    angle = math.atan2(dy, dx)
+    angle = calculate_kick_angle(ball_x, ball_y, goal_x, goal_y, object_cells)
 
     # Generiere zufälliges Rauschen für den Schuss
     noise = generate_random_noise()
     angle += math.radians(noise)  # Füge das Rauschen zum Winkel hinzu
 
     # Normiere den Bewegungsvektor auf die maximale Distanz von 10 Metern
-    max_distance = 10
+    max_distance = calculate_kick_distance(ball_x, ball_y, goal_x, goal_y)
     dx = math.cos(angle) * max_distance
     dy = math.sin(angle) * max_distance
 
@@ -56,9 +112,11 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, cu
 
     # Iterative Bewegung entlang des Vektors
     current_x, current_y = ball_x, ball_y
-    for i in range(1, 101):  # Maximal 10 Schritte (entspricht 10 Meter in 0.1-Meter-Schritten)
-        current_x += dx / 100  # Teile den Vektor in 100 kleine Schritte
-        current_y += dy / 100
+    steps = 100
+    for i in range(1, steps+1):  # Maximal 10 Schritte (entspricht 10 Meter in 0.1-Meter-Schritten)
+        last_x, last_y = current_x, current_y
+        current_x += dx / steps  # Teile den Vektor in 100 kleine Schritte
+        current_y += dy / steps
 
         # Runde auf das Grid für Planungszwecke
         grid_x = math.floor(current_x)
@@ -82,9 +140,14 @@ def kick_ball(robot_x, robot_y, ball_x, ball_y, goal_x, goal_y, object_cells, cu
             obj_x, obj_y = map(int, obj_cell.replace("cell_", "").split('_'))
             if obj_x <= current_x < obj_x + 1 and obj_y <= current_y < obj_y + 1:
                 print(f"Ball trifft Objekt bei {obj_cell}. Reflektiere.")
-                if obj_x <= grid_x < obj_x + 1:  # Reflektion an x-Seiten des Objekts
+                if last_x <= obj_x < current_x:
                     dx *= -1
-                if obj_y <= grid_y < obj_y + 1:  # Reflektion an y-Seiten des Objekts
+                elif last_x >= obj_x + 1 > current_x:
+                    dx *= -1
+                # Reflektion an y-Seiten des Objekts
+                if last_y <= obj_y < current_y:
+                    dy *= -1
+                elif last_y >= obj_y + 1 > current_y:
                     dy *= -1
 
         # Prüfe, ob der Ball das Tor erreicht
